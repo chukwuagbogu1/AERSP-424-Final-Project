@@ -1,22 +1,29 @@
 #ifndef BANK_H
 #define BANK_H
+
 #include <map>
+#include <vector>
 #include "UserAccount.h"
+#include "Transaction.h"
 class Bank {
 private:
     std::map<std::string, UserAccount> accounts;
-    static Bank* instance;
-    Bank() {} // Private constructor for singleton
+    std::vector<Transaction> transactions;
+
+   
 public:
-    static Bank* getInstance();
-
-    // Account operations
-    std::string createAccount(const std::string& password);
-    UserAccount* getAccount(const std::string& accountNumber);
-    bool transfer(const std::string& fromAcc, const std::string& toAcc, double amount);
-
-    // File operations
-    void loadAccounts();
-    void saveAccounts() const;
+    Bank();
+    
+    // Account management
+    bool createAccount(const std::string& name, const std::string& password);
+    UserAccount* login(const std::string& accountNumber, const std::string& password);
+    
+    // Transaction operations
+    bool transfer(const std::string& fromAccount, const std::string& toAccount, double amount);
+    std::vector<Transaction> getTransactionHistory(const std::string& accountNumber) const;
+    
+    // Data persistence
+    void loadData();
+    void saveData() const;
 };
 #endif
