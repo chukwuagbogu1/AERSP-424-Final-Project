@@ -57,7 +57,7 @@ void FileHandler::loadTransactions(std::vector<Transaction>& transactions) {
         std::time_t timestamp = std::stoull(timestampStr);
 
         Transaction transaction(accNum, type, amount, desc);
-        transaction.timestamp = timestamp;
+        transaction.date = timestampStr;
         transactions.push_back(transaction);
     }
 }

@@ -8,7 +8,7 @@ UserAccount::UserAccount(const std::string& name, const std::string& password)
 bool UserAccount::verifyPassword(const std::string& inputPassword) const {
     return password == inputPassword;
 }
-void UserAccount::deposit(double amount) {
+bool UserAccount::deposit(double amount) {
     if (amount > 0) {
         balance += amount;
     }
