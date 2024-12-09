@@ -13,6 +13,16 @@ bool UserAccount::deposit(double amount) {
         balance += amount;
     }
 }
+/**
+ * \brief Withdraw money from the account.
+ *
+ * If the amount is positive and does not exceed the current balance, the
+ * balance is reduced by the amount and true is returned. Otherwise, false is
+ * returned.
+ *
+ * \param amount Positive amount of money to withdraw.
+ * \return True if the withdrawal is successful, false otherwise.
+ */
 bool UserAccount::withdraw(double amount) {
     if (amount > 0 && amount <= balance) {
         balance -= amount;
