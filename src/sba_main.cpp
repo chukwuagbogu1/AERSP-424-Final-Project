@@ -117,7 +117,7 @@ int main() {
                         auto history = bank.getTransactionHistory(accountNumber);
                         std::cout << "\nTransaction History:\n";
                         for (const auto& trans : history) {
-                            std::cout << "Date: " << std::ctime(&trans.getTimestamp())
+                            std::cout << "Date: " << trans.getDate() << std::endl
                                 << "Type: " << static_cast<int>(trans.getType())
                                 << " Amount: $" << trans.getAmount()
                                 << " Description: " << trans.getDescription() << "\n";
