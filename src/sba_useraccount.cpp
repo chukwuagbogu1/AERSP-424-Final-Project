@@ -12,6 +12,7 @@ bool UserAccount::deposit(double amount) {
     if (amount > 0) {
         balance += amount;
     }
+    return balance;
 }
 /**
  * \brief Withdraw money from the account.
