@@ -1,80 +1,59 @@
 #include "Bank.h"
-#include <random>
-#include <sstream>
-#include <filesystem>
-Bank* Bank::instance = nullptr;
-Bank* Bank::getInstance() {
-    if (instance == nullptr) {
-        instance = new Bank();
-        instance->loadAccounts();
-    }
-    return instance;
+#include "FileHandler.h"
+Bank::Bank() {
+    loadData();
 }
-std::string Bank::createAccount(const std::string& password) {
-    // Generate unique account number
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(10000000, 99999999);
-    
-    std::string accountNumber;
-    do {
-        accountNumber = std::to_string(dis(gen));
-    } while (accounts.find(accountNumber) != accounts.end());
-    
-    UserAccount newAccount(accountNumber, password);
-    accounts[accountNumber] = newAccount;
-    newAccount.saveToFile();
-    
-    return accountNumber;
+bool Bank::createAccount(const std::string& name, const std::string& password) {
+    UserAccount newAccount(name, password);
+    accounts[newAccount.getAccountNumber()] = newAccount;
+    saveData();
+    return true;
 }
-UserAccount* Bank::getAccount(const std::string& accountNumber) {
+UserAccount* Bank::login(const std::string& accountNumber, const std::string& password) {
     auto it = accounts.find(accountNumber);
-    if (it != accounts.end()) {
-        return &(it->second);
+    if (it != accounts.end() && it->second.verifyPassword(password)) {
+        return &it->second;
     }
     return nullptr;
 }
-bool Bank::transfer(const std::string& fromAcc, const std::string& toAcc, double amount) {
-    UserAccount* from = getAccount(fromAcc);
-    UserAccount* to = getAccount(toAcc);
-    
-    if (!from || !to || amount <= 0 || amount > from->getBalance()) {
-        return false;
-    }
-    
-    // Perform transfer
-    if (from->withdraw(amount)) {
-        if (to->deposit(amount)) {
-            Transaction transSent(TransactionType::TRANSFER_SENT, amount, 
-                                "Transfer to " + toAcc);
-            Transaction transReceived(TransactionType::TRANSFER_RECEIVED, amount, 
-                                   "Transfer from " + fromAcc);
-            
-            from->addTransaction(transSent);
-            to->addTransaction(transReceived);
-            
-            from->saveToFile();
-            to->saveToFile();
+bool Bank::transfer(const std::string& fromAccount, const std::string& toAccount, double amount) {
+    auto fromIt = accounts.find(fromAccount);
+    auto toIt = accounts.find(toAccount);
+
+    if (fromIt != accounts.end() && toIt != accounts.end()) {
+        if (fromIt->second.withdraw(amount)) {
+            toIt->second.deposit(amount);
+
+            // Record transactions
+            transactions.emplace_back(fromAccount, TransactionType::TRANSFER_SENT, amount,
+                "Transfer to " + toAccount);
+            transactions.emplace_back(toAccount, TransactionType::TRANSFER_RECEIVED, amount,
+                "Transfer from " + fromAccount);
+
+            saveData();
             return true;
         }
-        // If deposit fails, rollback withdrawal
-        from->deposit(amount);
     }
     return false;
 }
-void Bank::loadAccounts() {
-    namespace fs = std::filesystem;
-    std::string path = "accounts/";
-    
-    for (const auto& entry : fs::directory_iterator(path)) {
-        if (entry.path().extension() == ".txt") {
-            std::string accNum = entry.path().stem().string();
-            accounts[accNum] = UserAccount::loadFromFile(accNum);
+std::vector<Transaction> Bank::getTransactionHistory(const std::string& accountNumber) const {
+    std::vector<Transaction> history;
+    for (const auto& transaction : transactions) {
+        if (transaction.getAccountNumber() == accountNumber) {
+            history.push_back(transaction);
         }
     }
+    return history;
 }
-void Bank::saveAccounts() const {
-    for (const auto& pair : accounts) {
-        pair.second.saveToFile();
+void Bank::loadData() {
+    FileHandler::loadAccounts(accounts);
+    FileHandler::loadTransactions(transactions);
+}
+void Bank::saveData() const {
+    for (const auto& account : accounts) {
+        FileHandler::saveAccount(account.second);
+    }
+    for (const auto& transaction : transactions) {
+        FileHandler::saveTransaction(transaction);
     }
 }

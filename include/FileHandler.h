@@ -2,6 +2,7 @@
 #define FILE_HANDLER_H
 
 #include <string>
+#include <map>
 #include "UserAccount.h"
 #include "Transaction.h"
 

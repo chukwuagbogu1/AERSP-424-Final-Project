@@ -28,6 +28,8 @@ public:
     std::string getDate() const { return date; }
     std::string getDescription() const { return description; }
 
+    Transaction(TransactionType t, double amt, const std::string& desc);
+
     // String representation for file storage
     std::string toString() const;
 

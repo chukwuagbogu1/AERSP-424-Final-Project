@@ -1,13 +1,14 @@
 #ifndef BANK_H
 #define BANK_H
 
+#include <iostream>
 #include <map>
 #include <vector>
 #include "UserAccount.h"
 #include "Transaction.h"
 class Bank {
-private:
-    std::map<std::string, UserAccount> accounts;
+private:  //Maps account numbers to UserAccount objects for quick and easy access
+    std::map<std::string, UserAccount> accounts;  //stores all transactions across all acocunts
     std::vector<Transaction> transactions;
 
    

@@ -5,25 +5,19 @@ project(BankingService)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add the executables i.e the files
-add_executable(BankingService
-    main.cpp
-    Bank.cpp
-    Bank.h
-    Chatbot.cpp
-    Chatbot.h
-    Transaction.cpp
-    Transaction.h
-    UserAccount.cpp
-    UserAccount.h
-)
 
-# Create accounts directory during build
-add_custom_command(
-    TARGET BankingService POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-    ${CMAKE_BINARY_DIR}/accounts
+# Add the executables i.e the files
+include_directories(
+${PROJECT_SOURCE_DIR}/include
+${PROJECT_SOURCE_DIR}/src
 )
+file(GLOB all_SRCS
+"${PROJECT_SOURCE_DIR}/include/*.h"
+"${PROJECT_SOURCE_DIR}/include/*.hpp"
+"${PROJECT_SOURCE_DIR}/src/*.cpp"
+"${PROJECT_SOURCE_DIR}/src/*.c"
+)
+add_executable(${CMAKE_PROJECT_NAME} ${all_SRCS})
 
 # USing MSVC compiler
 if(MSVC)

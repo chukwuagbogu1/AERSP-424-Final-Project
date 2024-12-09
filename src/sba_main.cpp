@@ -3,163 +3,163 @@
 #include <limits>
 #include "Bank.h"
 #include "Chatbot.h"
+#include <sba_bank2.cpp>s
 void clearScreen() {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 void displayMenu() {
-    std::cout << "\n=== Banking Service Menu ===\n"
-              << "1. Create new account\n"
-              << "2. Login to existing account\n"
-              << "3. Chat with support bot\n"
-              << "4. Exit\n"
-              << "Enter your choice: ";
+    std::cout << "\nBanking System Menu\n"
+        << "1. Create Account\n"
+        << "2. Login\n"
+        << "3. Chat with Assistant\n"
+        << "4. Exit\n"
+        << "Enter your choice: ";
 }
 void displayLoggedInMenu() {
-    std::cout << "\n=== Account Menu ===\n"
-              << "1. Check balance\n"
-              << "2. View transaction history\n"
-              << "3. Deposit/Withdraw\n"
-              << "4. Transfer money\n"
-              << "5. Logout\n"
-              << "Enter your choice: ";
-}
-void handleNewAccount() {
-    std::string password;
-    std::cout << "Enter password for new account: ";
-    std::cin >> password;
-    
-    std::string accountNumber = Bank::getInstance()->createAccount(password);
-    std::cout << "Account created successfully!\n"
-              << "Your account number is: " << accountNumber << "\n"
-              << "Please save this number for future reference.\n";
-}
-void handleLogin() {
-    std::string accountNumber, password;
-    std::cout << "Enter account number: ";
-    std::cin >> accountNumber;
-    std::cout << "Enter password: ";
-    std::cin >> password;
-    
-    UserAccount* account = Bank::getInstance()->getAccount(accountNumber);
-    if (account && account->verifyPassword(password)) {
-        bool logout = false;
-        while (!logout) {
-            displayLoggedInMenu();
-            int choice;
-            std::cin >> choice;
-            
-            switch (choice) {
-                case 1: // Check balance
-                    std::cout << "Current balance: $" << account->getBalance() << std::endl;
-                    break;
-                    
-                case 2: // View transaction history
-                    std::cout << "\nTransaction History:\n";
-                    for (const auto& trans : account->getTransactionHistory()) {
-                        std::cout << trans.toString() << std::endl;
-                    }
-                    break;
-                    
-                case 3: { // Deposit/Withdraw
-                    std::cout << "1. Deposit\n2. Withdraw\nChoice: ";
-                    int subChoice;
-                    std::cin >> subChoice;
-                    
-                    double amount;
-                    std::cout << "Enter amount: $";
-                    std::cin >> amount;
-                    
-                    if (subChoice == 1) {
-                        if (account->deposit(amount)) {
-                            std::cout << "Deposit successful!\n";
-                        } else {
-                            std::cout << "Invalid amount for deposit.\n";
-                        }
-                    } else if (subChoice == 2) {
-                        if (account->withdraw(amount)) {
-                            std::cout << "Withdrawal successful!\n";
-                        } else {
-                            std::cout << "Insufficient funds or invalid amount.\n";
-                        }
-                    }
-                    break;
-                }
-                
-                case 4: { // Transfer money
-                    std::string targetAccount;
-                    double amount;
-                    
-                    std::cout << "Enter target account number: ";
-                    std::cin >> targetAccount;
-                    std::cout << "Enter amount to transfer: $";
-                    std::cin >> amount;
-                    
-                    if (Bank::getInstance()->transfer(accountNumber, targetAccount, amount)) {
-                        std::cout << "Transfer successful!\n";
-                    } else {
-                        std::cout << "Transfer failed. Please check account number and amount.\n";
-                    }
-                    break;
-                }
-                
-                case 5: // Logout
-                    logout = true;
-                    break;
-                
-                default:
-                    std::cout << "Invalid choice.\n";
-            }
-        }
-    } else {
-        std::cout << "Invalid account number or password.\n";
-    }
-}
-void handleChatbot() {
-    Chatbot chatbot;
-    std::string query;
-    
-    std::cout << "Chat with our support bot (type 'exit' to return to main menu)\n";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    
-    while (true) {
-        std::cout << "\nYou: ";
-        std::getline(std::cin, query);
-        
-        if (query == "exit") break;
-        
-        std::cout << "Bot: " << chatbot.getResponse(query) << std::endl;
-    }
+    std::cout << "\nAccount Menu\n"
+        << "1. Check Balance\n"
+        << "2. Deposit\n"
+        << "3. Withdraw\n"
+        << "4. Transfer\n"
+        << "5. Transaction History\n"
+        << "6. Logout\n"
+        << "Enter your choice: ";
 }
 int main() {
-    // Create accounts directory if it doesn't exist
-    system("mkdir -p accounts");
-    
+    Bank bank;
+    Chatbot chatbot;
+
     while (true) {
+        clearScreen();
         displayMenu();
+
         int choice;
         std::cin >> choice;
-        
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
         switch (choice) {
-            case 1:
-                handleNewAccount();
-                break;
-            case 2:
-                handleLogin();
-                break;
-            case 3:
-                handleChatbot();
-                break;
-            case 4:
-                std::cout << "Thank you for using our banking service!\n";
-                return 0;
-            default:
-                std::cout << "Invalid choice. Please try again.\n";
+        case 1: {
+            std::string name, password;
+            std::cout << "Enter name: ";
+            std::getline(std::cin, name);
+            std::cout << "Enter password: ";
+            std::getline(std::cin, password);
+
+            if (bank.createAccount(name, password)) {
+                std::cout << "Account created successfully!\n";
+            }
+            break;
+        }
+        case 2: {
+            std::string accountNumber, password;
+            std::cout << "Enter account number: ";
+            std::getline(std::cin, accountNumber);
+            std::cout << "Enter password: ";
+            std::getline(std::cin, password);
+
+            UserAccount* account = bank.login(accountNumber, password);
+            if (account) {
+                bool loggedIn = true;
+                while (loggedIn) {
+                    clearScreen();
+                    std::cout << "Welcome, " << account->getName() << "!\n";
+                    displayLoggedInMenu();
+
+                    int subChoice;
+                    std::cin >> subChoice;
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+                    switch (subChoice) {
+                    case 1:
+                        std::cout << "Current balance: $" << account->getBalance() << "\n";
+                        break;
+                    case 2: {
+                        double amount;
+                        std::cout << "Enter amount to deposit: $";
+                        std::cin >> amount;
+                        account->deposit(amount);
+                        std::cout << "Deposit successful!\n";
+                        break;
+                    }
+                    case 3: {
+                        double amount;
+                        std::cout << "Enter amount to withdraw: $";
+                        std::cin >> amount;
+                        if (account->withdraw(amount)) {
+                            std::cout << "Withdrawal successful!\n";
+                        }
+                        else {
+                            std::cout << "Insufficient funds!\n";
+                        }
+                        break;
+                    }
+                    case 4: {
+                        std::string toAccount;
+                        double amount;
+                        std::cout << "Enter recipient's account number: ";
+                        std::getline(std::cin, toAccount);
+                        std::cout << "Enter amount to transfer: $";
+                        std::cin >> amount;
+
+                        if (bank.transfer(accountNumber, toAccount, amount)) {
+                            std::cout << "Transfer successful!\n";
+                        }
+                        else {
+                            std::cout << "Transfer failed!\n";
+                        }
+                        break;
+                    }
+                    case 5: {
+                        auto history = bank.getTransactionHistory(accountNumber);
+                        std::cout << "\nTransaction History:\n";
+                        for (const auto& trans : history) {
+                            std::cout << "Date: " << std::ctime(&trans.getTimestamp())
+                                << "Type: " << static_cast<int>(trans.getType())
+                                << " Amount: $" << trans.getAmount()
+                                << " Description: " << trans.getDescription() << "\n";
+                        }
+                        break;
+                    }
+                    case 6:
+                        loggedIn = false;
+                        break;
+                    }
+                    if (loggedIn) {
+                        std::cout << "\nPress Enter to continue...";
+                        std::cin.get();
+                    }
+                }
+            }
+            else {
+                std::cout << "Invalid account number or password!\n";
+            }
+            break;
+        }
+        case 3: {
+            std::string query;
+            std::cout << "Chat with our assistant (type 'exit' to return to main menu)\n";
+            while (true) {
+                std::cout << "\nYou: ";
+                std::getline(std::cin, query);
+                if (query == "exit") break;
+                std::cout << "Assistant: " << chatbot.getResponse(query) << "\n";
+            }
+            break;
+        }
+        case 4:
+            std::cout << "Thank you for using our banking system!\n";
+            return 0;
+        }
+
+        if (choice != 4) {
+            std::cout << "\nPress Enter to continue...";
+            std::cin.get();
         }
     }
-    
+
     return 0;
 }
