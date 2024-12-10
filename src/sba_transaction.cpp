@@ -1,29 +1,17 @@
 #include "Transaction.h"
 #include <sstream>
+#include <iomanip>
+Transaction::Transaction(const std::string& accNum, TransactionType type,
+    double amount, const std::string& desc)
+    : accountNumber(accNum), type(type), amount(amount),
+    description(desc), timestamp(std::time(nullptr)) {
+}
 std::string Transaction::toString() const {
     std::stringstream ss;
     ss << accountNumber << "|"
-       << static_cast<int>(type) << "|"
-       << amount << "|"
-       << date << "|"
-       << description;
+        << static_cast<int>(type) << "|"
+        << std::fixed << std::setprecision(2) << amount << "|"
+        << timestamp << "|"
+        << description;
     return ss.str();
-}
-Transaction Transaction::fromString(const std::string& str) {
-    std::stringstream ss(str);
-    std::string accNum, dateStr, desc;
-    int typeInt;
-    double amt;
-    
-    std::getline(ss, accNum, '|');
-    ss >> typeInt;
-    ss.ignore(); // Skip the delimiter
-    ss >> amt;
-    ss.ignore();
-    std::getline(ss, dateStr, '|');
-    std::getline(ss, desc);
-    return Transaction(accNum, 
-                      static_cast<TransactionType>(typeInt),
-                      amt,
-                      desc);
 }

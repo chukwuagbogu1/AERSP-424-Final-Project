@@ -9,8 +9,9 @@ private:
     std::string password; //User's account password
     double balance; //User's account balance
     std::string name; //User's name
-
 public:
+    UserAccount() {};
+
     UserAccount(const std::string& accNum, const std::string& pwd);
 
     // Getters method

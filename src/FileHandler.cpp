@@ -54,10 +54,10 @@ void FileHandler::loadTransactions(std::vector<Transaction>& transactions) {
 
         TransactionType type = static_cast<TransactionType>(std::stoi(typeStr));
         double amount = std::stod(amountStr);
-        std::time_t timestampStr = std::stoull(timestampStr);
+        std::time_t timestamp = std::stoull(timestampStr);
 
         Transaction transaction(accNum, type, amount, desc);
-        transaction.date = timestampStr;
+        transaction.timestamp = timestamp;
         transactions.push_back(transaction);
     }
 }
