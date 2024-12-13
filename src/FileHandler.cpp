@@ -7,7 +7,9 @@ void FileHandler::saveAccount(const UserAccount& account) {
         file << account.accountNumber << "|"
             << account.name << "|"
             << account.password << "|"
-            << account.balance << "\n";
+            << account.balance << "|"
+            << account.securityQuestion << "|"
+            << account.securityAnswer << "\n";
         file.close();
     }
 }
@@ -24,15 +26,18 @@ void FileHandler::loadAccounts(std::map<std::string, UserAccount>& accounts) {
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
-        std::string accNum, name, password;
+        std::string accNum, name, password, securityQuestion, securityAnswer;
         double balance;
 
         std::getline(ss, accNum, '|');
         std::getline(ss, name, '|');
         std::getline(ss, password, '|');
         ss >> balance;
+        ss.ignore(); // Skip the delimiter
+        std::getline(ss, securityQuestion, '|');
+        std::getline(ss, securityAnswer);
 
-        UserAccount account(name, password);
+        UserAccount account(name, password, securityQuestion, securityAnswer);
         account.accountNumber = accNum;
         account.balance = balance;
         accounts[accNum] = account;

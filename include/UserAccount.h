@@ -9,10 +9,13 @@ private:
     std::string password; //User's account password
     double balance; //User's account balance
     std::string name; //User's name
+    std::string securityQuestion; // Security question
+    std::string securityAnswer;   // Answer to security question
+
 public:
     UserAccount() {};
 
-    UserAccount(const std::string& accNum, const std::string& pwd);
+    UserAccount(const std::string& accNum, const std::string& pwd, const std::string& securityQuestion, const std::string& securityAnswer);
 
     // Getters method
     std::string getAccountNumber() const { return accountNumber; }
@@ -21,6 +24,9 @@ public:
 
     // Account operations
     bool verifyPassword(const std::string& pwd) const;
+    bool verifySecurityAnswer(const std::string& answer) const;
+    void resetPassword(const std::string& newPassword);
+
     bool deposit(double amount);
     bool withdraw(double amount);
     

@@ -16,9 +16,9 @@ public:
     Bank();
     
     // Account management
-    bool createAccount(const std::string& name, const std::string& password);
+    bool createAccount(const std::string& name, const std::string& password, const std::string& securityQuestion, const std::string& securityAnswer);
     UserAccount* login(const std::string& accountNumber, const std::string& password);
-    
+    bool resetPassword(const std::string& accountNumber, const std::string& securityAnswer,const std::string& newPassword);
     // Transaction operations
     bool transfer(const std::string& fromAccount, const std::string& toAccount, double amount);
     std::vector<Transaction> getTransactionHistory(const std::string& accountNumber) const;
@@ -26,5 +26,6 @@ public:
     // Data persistence
     void loadData();
     void saveData() const;
+    std::map<std::string, UserAccount>& getAccounts();
 };
 #endif

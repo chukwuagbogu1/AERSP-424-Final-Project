@@ -3,12 +3,40 @@
 Bank::Bank() {
     loadData();
 }
-bool Bank::createAccount(const std::string& name, const std::string& password) {
-    UserAccount newAccount(name, password);
-    accounts[newAccount.getAccountNumber()] = newAccount;
+bool Bank::createAccount(const std::string& name, const std::string& password, const std::string& securityQuestion, const std::string& securityAnswer) {
+    // Check if an account with this name already exists
+    for (const auto& pair : accounts) {
+        if (pair.second.getName() == name) {
+            std::cout << "An account with this name already exist. Please enter a different name or exit to the main menu and log in with the account number associated with this name" << std::endl;
+            return false; // Account with this name already exists
+        }
+    }
+    UserAccount newAccount(name, password, securityQuestion, securityAnswer);
+
+    std::string accountNum =
+        newAccount.getAccountNumber()
+        ;
+    accounts[accountNum] = newAccount;
+
+    // Log the account creation and number for debugging
+    std::cout << "Created account with number: " << accountNum << std::endl;
+
+
     saveData();
     return true;
 }
+
+bool Bank::resetPassword(const std::string& accountNumber, const std::string& securityAnswer,
+    const std::string& newPassword) {
+    auto it = accounts.find(accountNumber);
+    if (it != accounts.end() && it->second.verifySecurityAnswer(securityAnswer)) {
+        it->second.resetPassword(newPassword);
+        saveData();
+        return true;
+    }
+    return false;
+}
+
 UserAccount* Bank::login(const std::string& accountNumber, const std::string& password) {
     auto it = accounts.find(accountNumber);
     if (it != accounts.end() && it->second.verifyPassword(password)) {
@@ -56,4 +84,7 @@ void Bank::saveData() const {
     for (const auto& transaction : transactions) {
         FileHandler::saveTransaction(transaction);
     }
+}
+std::map<std::string, UserAccount>& Bank::getAccounts() {
+    return accounts;
 }
