@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+
+//Class to manage individual user accounts
 class UserAccount {
 private:
     std::string accountNumber; //Unique account identifier
@@ -13,11 +15,12 @@ private:
     std::string securityAnswer;   // Answer to security question
 
 public:
+    //create new user account
     UserAccount() {};
 
     UserAccount(const std::string& accNum, const std::string& pwd, const std::string& securityQuestion, const std::string& securityAnswer);
 
-    // Getters method
+    // Getters method for account details
     std::string getAccountNumber() const { return accountNumber; }
     double getBalance() const { return balance; }
     std::string getName() const { return name; }
@@ -26,7 +29,7 @@ public:
     bool verifyPassword(const std::string& pwd) const;
     bool verifySecurityAnswer(const std::string& answer) const;
     void resetPassword(const std::string& newPassword);
-
+    //Money operations
     bool deposit(double amount);
     bool withdraw(double amount);
     

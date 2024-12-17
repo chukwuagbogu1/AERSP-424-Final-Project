@@ -1,20 +1,26 @@
 #include "Chatbot.h"
 #include <fstream>
 #include <algorithm>
+
+//Initialize chatbot and load response
 Chatbot::Chatbot() {
     loadResponses();
 }
+
+//Process user query and return appropriate response
 std::string Chatbot::getResponse(const std::string& query) {
     // Convert query to lowercase for case-insensitive matching
     std::string lowerQuery = query;
     std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
-    
+    //Search for matching keywords in response
     auto it = responses.find(lowerQuery);
     if (it != responses.end()) {
         return it->second;
     }
     return "I'm sorry, I don't understand that question. Please try asking something else.";
 }
+
+//Initialize predefined responses for common queries
 void Chatbot::loadResponses() {
     responses = {
         {"balance", "To check your balance, Log in from the home menu and then option 1 from the account menu."},

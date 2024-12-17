@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iostream>
 
+//Create new user account
 UserAccount::UserAccount(const std::string& name, const std::string& password, const std:: string& securityQuestion, const std::string& securityAnswer)
     : name(name), password(password), balance(100.0) {
     accountNumber = generateAccountNumber();
@@ -12,18 +13,20 @@ UserAccount::UserAccount(const std::string& name, const std::string& password, c
     std::cout << "New account created - Name: " << name << ", Account Number: " << accountNumber << std::endl;
 }
 
+//Check if password matches
 bool UserAccount::verifyPassword(const std::string& inputPassword) const {
     return password == inputPassword;
 }
-
+//verify security answer for password reset
 bool UserAccount::verifySecurityAnswer(const std::string& answer) const {
     return securityAnswer == answer;
 }
+//Update account password
 void UserAccount::resetPassword(const std::string& newPassword) {
     password = newPassword;
     std::cout << "Password reset successful for account: " << accountNumber << std::endl;
 }
-
+//Add money to account
 bool UserAccount::deposit(double amount) {
     if (amount > 0) {
         balance += amount;
@@ -51,11 +54,14 @@ bool UserAccount::withdraw(double amount) {
     }
     return false;
 }
+
+//Generate unique account number using timestamp and random number
 std::string UserAccount::generateAccountNumber() {
     // Use current time as seed for more uniqueness
     auto now = std::chrono::system_clock::now();
     auto timestamp = std::chrono::system_clock::to_time_t(now);
 
+    //Generate  random 4-digit number
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 9999);

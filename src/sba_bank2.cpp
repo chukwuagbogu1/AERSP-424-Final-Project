@@ -1,8 +1,13 @@
 #include "Bank.h"
 #include "FileHandler.h"
+
+// Initializes bank and load existing data
 Bank::Bank() {
     loadData();
 }
+
+//Create new account with security details
+//Returns false if account with the same name exists
 bool Bank::createAccount(const std::string& name, const std::string& password, const std::string& securityQuestion, const std::string& securityAnswer) {
     // Check if an account with this name already exists
     for (const auto& pair : accounts) {
@@ -11,6 +16,8 @@ bool Bank::createAccount(const std::string& name, const std::string& password, c
             return false; // Account with this name already exists
         }
     }
+
+    //Create and store new account
     UserAccount newAccount(name, password, securityQuestion, securityAnswer);
 
     std::string accountNum =
@@ -36,7 +43,7 @@ bool Bank::resetPassword(const std::string& accountNumber, const std::string& se
     }
     return false;
 }
-
+//Authenticate user and return account pointer if successful
 UserAccount* Bank::login(const std::string& accountNumber, const std::string& password) {
     auto it = accounts.find(accountNumber);
     if (it != accounts.end() && it->second.verifyPassword(password)) {
@@ -44,6 +51,9 @@ UserAccount* Bank::login(const std::string& accountNumber, const std::string& pa
     }
     return nullptr;
 }
+
+//Transfer money between accounts
+//Returns false if either account not found or insufficient funds
 bool Bank::transfer(const std::string& fromAccount, const std::string& toAccount, double amount) {
     auto fromIt = accounts.find(fromAccount);
     auto toIt = accounts.find(toAccount);
@@ -52,7 +62,7 @@ bool Bank::transfer(const std::string& fromAccount, const std::string& toAccount
         if (fromIt->second.withdraw(amount)) {
             toIt->second.deposit(amount);
 
-            // Record transactions
+            // Record transactions for both accounts
             transactions.emplace_back(fromAccount, TransactionType::TRANSFER_SENT, amount,
                 "Transfer to " + toAccount);
             transactions.emplace_back(toAccount, TransactionType::TRANSFER_RECEIVED, amount,
@@ -64,6 +74,8 @@ bool Bank::transfer(const std::string& fromAccount, const std::string& toAccount
     }
     return false;
 }
+
+//Get all transactions for specific account
 std::vector<Transaction> Bank::getTransactionHistory(const std::string& accountNumber) const {
     std::vector<Transaction> history;
     for (const auto& transaction : transactions) {
@@ -73,10 +85,14 @@ std::vector<Transaction> Bank::getTransactionHistory(const std::string& accountN
     }
     return history;
 }
+
+//Load accounts and transactions from storage
 void Bank::loadData() {
     FileHandler::loadAccounts(accounts);
     FileHandler::loadTransactions(transactions);
 }
+
+//Save current state to persistent storage
 void Bank::saveData() const {
     for (const auto& account : accounts) {
         FileHandler::saveAccount(account.second);
@@ -85,6 +101,7 @@ void Bank::saveData() const {
         FileHandler::saveTransaction(transaction);
     }
 }
+//Get all accounts (admin access)
 std::map<std::string, UserAccount>& Bank::getAccounts() {
     return accounts;
 }

@@ -3,7 +3,8 @@
 #include <limits>
 #include "Bank.h"
 #include "Chatbot.h"
-//#include "sba_bank2.cpp"
+
+//Clear console screen based on operating system
 void clearScreen() {
 #ifdef _WIN32
     system("cls");
@@ -11,6 +12,7 @@ void clearScreen() {
     system("clear");
 #endif
 }
+//Display main menu option to user
 void displayMenu() {
     std::cout << "\nWelcome to A-VK Bank\n\n"
         <<"Home Menu\n"
@@ -41,6 +43,8 @@ void displayMenu() {
         <<"After reading and understanding all of the above, please\n"
         << "Enter your choice: ";
 }
+
+// Display menu options for logged-in users
 void displayLoggedInMenu() {
     std::cout << "\nAccount Menu\n"
         << "1. Check Balance\n"
@@ -52,19 +56,23 @@ void displayLoggedInMenu() {
         << "Enter your choice: ";
 }
 int main() {
+    // Initialize bank and chatbot systems
     Bank bank;
     Chatbot chatbot;
 
+    // Main application loop
     while (true) {
         clearScreen();
         displayMenu();
 
+        // Get user menu choice
         int choice;
         std::cin >> choice;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (choice) {
         case 1: {
+            // Account Creation
             std::string name, password, securityQuestion, securityAnswer;
             std::cout << "Enter name: ";
             std::getline(std::cin, name);
@@ -74,7 +82,8 @@ int main() {
             std::getline(std::cin, securityQuestion);
             std::cout << "Enter security answer: ";
             std::getline(std::cin, securityAnswer);
-
+            
+            // Create account and show result
             if (bank.createAccount(name, password, securityQuestion, securityAnswer)) {
                 std::cout << "Account created successfully!\n";
             }
@@ -84,16 +93,18 @@ int main() {
             break;
         }
         case 2: {
+            //Login process
             std::string accountNumber, password;
             std::cout << "Enter account number: ";
             std::getline(std::cin, accountNumber);
             std::cout << "Enter password: ";
             std::getline(std::cin, password);
             
-
+            //User's attempt to log in
             UserAccount* account = bank.login(accountNumber, password);
             if (account) {
                 bool loggedIn = true;
+                //Logged in user menu loop
                 while (loggedIn) {
                     clearScreen();
                     std::cout << "Welcome, " << account->getName() << "!\n";
@@ -104,10 +115,10 @@ int main() {
                     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
                     switch (subChoice) {
-                    case 1:
+                    case 1: //Check balance
                         std::cout << "Current balance: $" << account->getBalance() << "\n";
                         break;
-                    case 2: {
+                    case 2: { //Deposit money
                         double amount;
                         std::cout << "Enter amount to deposit: $";
                         std::cin >> amount;
@@ -116,6 +127,7 @@ int main() {
                         break;
                     }
                     case 3: {
+                        //Withdraw money
                         double amount;
                         std::cout << "Enter amount to withdraw: $";
                         std::cin >> amount;
@@ -128,6 +140,7 @@ int main() {
                         break;
                     }
                     case 4: {
+                        //Transfer money
                         std::string toAccount;
                         double amount;
                         std::cout << "Enter recipient's account number: ";
@@ -144,6 +157,7 @@ int main() {
                         break;
                     }
                     case 5: {
+                        //Transaction History
                         auto history = bank.getTransactionHistory(accountNumber);
                         std::cout << "\nTransaction History:\n";
                         for (const auto& trans : history) {
@@ -155,6 +169,7 @@ int main() {
                         break;
                     }
                     case 6:
+                        //Logout
                         loggedIn = false;
                         break;
                     }
@@ -170,6 +185,7 @@ int main() {
             break;
         }
         case 3: {
+            //Password reset
             std::string accountNumber, securityAnswer, newPassword;
             std::cout << "Enter account number: ";
             std::getline(std::cin, accountNumber);
@@ -178,6 +194,7 @@ int main() {
             std::cout << "Enter new password: ";
             std::getline(std::cin, newPassword);
 
+            //Attempt password reset
             if (bank.resetPassword(accountNumber, securityAnswer, newPassword)) {
                 std::cout << "Password reset successful!\n";
             }
@@ -187,6 +204,7 @@ int main() {
             break;
         }
         case 4: {
+            //Chat Assistant
             std::string query;
             std::cout << "Chat with our assistant (type 'exit' to return to main menu)\n";
             while (true) {
@@ -197,7 +215,7 @@ int main() {
             }
             break;
         }
-        case 5:
+        case 5: //Exit application
             std::cout << "Thank you for A-VK banking system!\n";
             return 0;
         }
